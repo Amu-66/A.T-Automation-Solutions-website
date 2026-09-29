@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const lines = [
   {
@@ -57,6 +58,11 @@ const designItems = [
   "Thank You Cards",
   "Business Profiles",
   "Key Holder Designs",
+  "Invoices",
+  "Quotations",
+  "Business Plans",
+  "Business Proposals",
+  "Corporate Documents",
 ];
 
 function PricingCard({ line, index }: { line: (typeof lines)[number]; index: number }) {
@@ -189,7 +195,8 @@ function DesignCard() {
         </h3>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-chrome">
           Sharp, brand-consistent design and artwork — built for print or digital use.
-          Design and artwork only; printing is not included.
+          From marketing material to full corporate documentation, if you can brief it,
+          we can design it. Design and artwork only; printing is not included.
         </p>
 
         <div className="mt-8 flex flex-wrap gap-2.5">
@@ -201,6 +208,9 @@ function DesignCard() {
               {item}
             </span>
           ))}
+          <span className="rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-2 font-mono text-[11px] tracking-wide text-amber-400">
+            + anything you need
+          </span>
         </div>
 
         <div className="mt-9 grid gap-4 border-t border-white/10 pt-7 sm:grid-cols-3">
@@ -251,14 +261,13 @@ export default function Pricing() {
       </div>
 
       <div className="relative mx-auto mt-14 max-w-6xl text-center">
-        <a
-          href="#offer"
-          data-cursor="button"
-          className="glow-amber-hover inline-block rounded-full bg-plasma px-8 py-4 font-heading text-sm font-semibold tracking-wide text-white transition-shadow duration-300"
+        <Link
+          to="/contact"
+          className="glow-amber-hover inline-block rounded-full px-8 py-4 font-heading text-sm font-semibold tracking-wide text-white transition-shadow duration-300"
           style={{ backgroundColor: "#0047FF" }}
         >
           Get a Custom Quote
-        </a>
+        </Link>
       </div>
     </section>
   );

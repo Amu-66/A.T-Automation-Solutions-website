@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, MessageCircle } from "lucide-react";
+import { FORM_WEBHOOK_URL, WHATSAPP_DISPLAY, waLink } from "../site";
 
 const challenges = [
   "Missed leads & slow follow-up",
   "Too much manual admin",
   "Inconsistent social media",
   "Ads not converting",
+  "No website / outdated website",
+  "Need professional graphic design",
 ];
 
 const businessTypes = [
@@ -20,7 +23,14 @@ const contactTimes = ["Morning", "Afternoon", "Evening", "Anytime"];
 
 export default function CTAForm() {
   const [step, setStep] = useState(0);
-  const [data, setData] = useState({ challenge: "", business: "", time: "", name: "", contact: "" });
+  const [data, setData] = useState({
+    challenge: "",
+    business: "",
+    time: "",
+    name: "",
+    contact: "",
+    designBrief: "",
+  });
   const [submitted, setSubmitted] = useState(false);
 
   const totalSteps = 3;
@@ -31,8 +41,33 @@ export default function CTAForm() {
     setTimeout(() => setStep((s) => Math.min(s + 1, totalSteps - 1)), 250);
   };
 
+  const summary = () =>
+    [
+      "Hi Amukelani, I'd like a free audit.",
+      `Name: ${data.name}`,
+      `Contact: ${data.contact}`,
+      `Need help with: ${data.challenge}`,
+      data.designBrief ? `Design brief: ${data.designBrief}` : "",
+      `Business: ${data.business}`,
+      `Best time to reach me: ${data.time}`,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+  // Previously the form only showed a success screen and the lead went nowhere.
+  // Now it opens WhatsApp with the request pre-filled (and optionally posts it
+  // to a Make.com / n8n webhook set in src/site.ts).
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const text = summary();
+    window.open(waLink(text), "_blank", "noopener");
+    if (FORM_WEBHOOK_URL) {
+      fetch(FORM_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...data, source: "website-audit-form", submittedAt: new Date().toISOString() }),
+      }).catch(() => {});
+    }
     setSubmitted(true);
   };
 
@@ -48,10 +83,19 @@ export default function CTAForm() {
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200 }}>
           <CheckCircle2 className="mx-auto text-emerald-400" size={56} />
         </motion.div>
-        <h3 className="mt-6 font-display text-2xl font-bold text-glacier">System Confirmed.</h3>
+        <h3 className="mt-6 font-display text-2xl font-bold text-glacier">Almost done — hit send.</h3>
         <p className="mt-2 text-sm text-chrome">
-          Your audit request has been received. Expect a message from A.T Automation Solutions within 24 hours.
+          WhatsApp has opened with your request filled in. Press send and you'll hear back
+          within 24 hours. If it didn't open, use the button below.
         </p>
+        <a
+          href={waLink(summary())}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-6 py-3 font-heading text-sm font-semibold text-[#03030A]"
+        >
+          <MessageCircle size={16} /> Send on WhatsApp ({WHATSAPP_DISPLAY})
+        </a>
       </div>
     );
   }
@@ -76,7 +120,9 @@ export default function CTAForm() {
             transition={{ duration: 0.4 }}
           >
             <span className="font-mono text-xs text-cyan-400">STEP 01 / 03</span>
-            <h3 className="mt-2 font-display text-xl font-bold text-glacier">What's your biggest challenge?</h3>
+            <h3 className="mt-2 font-display text-xl font-bold text-glacier">
+              What do you need help with?
+            </h3>
             <div className="mt-6 grid gap-3">
               {challenges.map((c) => (
                 <button
@@ -154,6 +200,20 @@ export default function CTAForm() {
               ))}
             </div>
 
+            {data.challenge === "Need professional graphic design" && (
+              <div className="mt-6">
+                <label className="font-mono text-[11px] tracking-wide text-amber-400">
+                  WHAT DO YOU NEED DESIGNED?
+                </label>
+                <input
+                  placeholder="e.g. logo, business profile, invoices, flyers…"
+                  value={data.designBrief}
+                  onChange={(e) => setData((d) => ({ ...d, designBrief: e.target.value }))}
+                  className="mt-2 w-full rounded-xl border border-amber-400/30 bg-amber-400/[0.04] px-4 py-3 text-sm text-glacier placeholder:text-chrome/60 outline-none focus:border-amber-400"
+                />
+              </div>
+            )}
+
             <div className="mt-6 grid gap-3">
               <input
                 required
@@ -178,8 +238,11 @@ export default function CTAForm() {
               className="glow-amber-hover mt-6 w-full rounded-xl bg-plasma py-3.5 font-heading text-sm font-semibold text-white disabled:opacity-40"
               style={{ backgroundColor: "#0047FF" }}
             >
-              Submit Request
+              Send My Audit Request
             </button>
+            <p className="mt-3 text-center font-mono text-[10px] tracking-wide text-chrome/70">
+              Opens WhatsApp with your answers filled in.
+            </p>
           </motion.form>
         )}
       </AnimatePresence>

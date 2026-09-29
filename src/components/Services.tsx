@@ -18,7 +18,7 @@ const services = [
     tag: "SYS_03 // WEB",
     title: "Website Development",
     desc: "High-performance websites engineered to convert visitors into booked calls — built for speed and scale.",
-    tools: "React · Webflow · Framer",
+    tools: "React · Arena AI",
   },
   {
     tag: "SYS_04 // LEADGEN",

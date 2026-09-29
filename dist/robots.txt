@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://a-t-automation-solutions-website.vercel.app/sitemap.xml

@@ -35,8 +35,14 @@ body {
 }
 
 #root {
-  perspective: 1200px;
   overflow-x: clip;
+}
+
+/* 3D depth for section animations. Kept off #root: perspective on an
+   ancestor turns position:fixed into position:absolute, which made the
+   header and WhatsApp button scroll away. */
+main > section:not([data-cursor-zone="hero"]) {
+  perspective: 1200px;
 }
 
 ::selection {
@@ -113,6 +119,15 @@ body {
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(0, 245, 255, 0.15);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------------- Hide scrollbar (nav strip) ---------------- */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 /* ---------------- Fonts helper classes ---------------- */

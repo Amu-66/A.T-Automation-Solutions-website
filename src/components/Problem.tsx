@@ -2,17 +2,17 @@ import { motion } from "framer-motion";
 
 const painPoints = [
   {
-    stat: "63%",
+    stat: "Daily",
     title: "Manual Follow-Ups",
     desc: "Leads go cold while your team copy-pastes the same messages by hand, every single day.",
   },
   {
-    stat: "1 in 4",
+    stat: "After 5pm",
     title: "Missed Leads",
     desc: "Enquiries land after hours and disappear before anyone replies — revenue lost silently.",
   },
   {
-    stat: "20+ hrs",
+    stat: "Weekly",
     title: "Wasted Hours Weekly",
     desc: "Skilled people trapped doing admin a machine could execute in seconds, flawlessly.",
   },

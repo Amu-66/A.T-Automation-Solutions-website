@@ -8,7 +8,8 @@ const tools = [
   { name: "Zapier", desc: "Fast, reliable integrations between core business apps." },
   { name: "Google Workspace", desc: "Docs, sheets and mail — fully automated." },
   { name: "Meta Ads", desc: "Precision ad targeting and campaign automation." },
-  { name: "Arena AI", desc: "Advanced AI agent orchestration for complex tasks." },
+  { name: "React", desc: "The framework we build every high-performance website on." },
+  { name: "Arena AI", desc: "AI-assisted website builds and agent orchestration." },
 ];
 
 export default function TechStack() {

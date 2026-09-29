@@ -1,17 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 
+// Honest, verifiable numbers only — swap in real client results as you get them
+// (e.g. { value: 12, prefix: "", suffix: "", label: "Businesses Automated" }).
 const stats = [
-  { value: 3200, suffix: "+", label: "Hours Saved Through Automation" },
-  { value: 180, suffix: "+", label: "Workflows Built" },
-  { value: 65, suffix: "+", label: "Businesses Automated" },
-  { value: 4, suffix: "x", label: "Client ROI Average" },
+  { value: 1500, prefix: "R", suffix: "", label: "Automations From (Once-Off)" },
+  { value: 5500, prefix: "R", suffix: "", label: "Websites From (Once-Off)" },
+  { value: 24, prefix: "", suffix: "h", label: "Reply to Every Enquiry" },
+  { value: 1, prefix: "", suffix: "", label: "Founder Builds Your System — No Hand-Offs" },
 ];
 
-function Counter({ value, suffix }: { value: number; suffix: string }) {
+function Counter({ value, prefix, suffix }: { value: number; prefix: string; suffix: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.6 });
-  const [display, setDisplay] = useState(0);
+  const [display, setDisplay] = useState(value);
 
   useEffect(() => {
     if (!inView) return;
@@ -30,7 +32,8 @@ function Counter({ value, suffix }: { value: number; suffix: string }) {
 
   return (
     <span ref={ref}>
-      {display}
+      {prefix}
+      {String(display).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
       {suffix}
     </span>
   );
@@ -45,9 +48,9 @@ export default function Counters() {
 
       <div className="relative mx-auto max-w-6xl">
         <div className="text-center mb-16">
-          <span className="font-mono text-xs tracking-[0.3em] text-cyan-400">THE NUMBERS</span>
+          <span className="font-mono text-xs tracking-[0.3em] text-cyan-400">WHAT YOU GET</span>
           <h2 className="mt-4 font-display text-3xl sm:text-4xl font-bold text-glacier">
-            Results, not promises.
+            Straight numbers. <span className="text-gradient">No hype.</span>
           </h2>
         </div>
 
@@ -62,7 +65,7 @@ export default function Counters() {
               className="text-center"
             >
               <div className="font-display text-4xl sm:text-6xl font-bold text-cyan-300">
-                <Counter value={s.value} suffix={s.suffix} />
+                <Counter value={s.value} prefix={s.prefix} suffix={s.suffix} />
               </div>
               <div className="mx-auto mt-3 h-0.5 w-10 bg-amber-400" />
               <p className="mt-3 font-mono text-[11px] sm:text-xs tracking-wide text-chrome">

@@ -1,80 +1,106 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 import ParticleNetwork from "./ParticleNetwork";
+import Logo from "./Logo";
 
-const LOGO_LETTERS = "A.T AUTOMATION".split("");
-
-function BootOverlay({ onDone }: { onDone: () => void }) {
+function BootOverlay({ onDone, skip }: { onDone: () => void; skip: boolean }) {
   const [gridIn, setGridIn] = useState(false);
   const [showLogo, setShowLogo] = useState(false);
-  const [exit, setExit] = useState(false);
+  const [exit, setExit] = useState(skip);
 
   useEffect(() => {
+    if (skip) {
+      onDone();
+      return;
+    }
     const t1 = setTimeout(() => setGridIn(true), 50);
-    const t2 = setTimeout(() => setShowLogo(true), 800);
-    const t3 = setTimeout(() => setExit(true), 2200);
-    const t4 = setTimeout(() => onDone(), 2700);
+    const t2 = setTimeout(() => setShowLogo(true), 400);
+    const t3 = setTimeout(() => setExit(true), 1700);
+    const t4 = setTimeout(() => onDone(), 2200);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
       clearTimeout(t4);
     };
-  }, [onDone]);
+  }, [onDone, skip]);
 
   return (
     <AnimatePresence>
       {!exit && (
         <motion.div
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
+          exit={{ opacity: 0, scale: 1.04 }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
           className="fixed inset-0 z-[999] flex items-center justify-center bg-[#03030A] overflow-hidden"
         >
+          {/* kept subtle so the black field reads like the brand artwork */}
           <div
             className={`circuit-grid absolute inset-0 transition-opacity duration-[800ms] ${
-              gridIn ? "opacity-100" : "opacity-0"
+              gridIn ? "opacity-40" : "opacity-0"
             }`}
           />
-          <div className="void-glow absolute inset-0" />
-          <div className="relative flex flex-wrap justify-center gap-x-3 px-6" style={{ perspective: 1000 }}>
-            {showLogo &&
-              LOGO_LETTERS.map((letter, i) => (
-                <motion.span
-                  key={i}
-                  initial={{
-                    opacity: 0,
-                    z: -400,
-                    x: (Math.random() - 0.5) * 200,
-                    y: (Math.random() - 0.5) * 200,
-                  }}
-                  animate={{ opacity: 1, z: 0, x: 0, y: 0 }}
-                  transition={{ duration: 0.6, delay: i * 0.035, ease: [0.16, 1, 0.3, 1] }}
-                  className="font-display text-3xl sm:text-5xl font-bold text-glacier tracking-tight"
-                  style={{ color: letter === " " ? "transparent" : "#F0F4FF" }}
+          <div className="void-glow absolute inset-0 opacity-50" />
+
+          {/* logo materialises from Z-depth */}
+          <div className="relative px-6" style={{ perspective: 1200 }}>
+            <AnimatePresence>
+              {showLogo && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.82, z: -400, filter: "blur(14px)" }}
+                  animate={{ opacity: 1, scale: 1, z: 0, filter: "blur(0px)" }}
+                  transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
+                  className="relative"
                 >
-                  {letter === " " ? "\u00A0" : letter}
-                </motion.span>
-              ))}
+                  <Logo markClassName="w-44 sm:w-60" />
+
+                  {/* chrome shimmer sweep across the lockup */}
+                  <motion.div
+                    initial={{ x: "-130%" }}
+                    animate={{ x: "130%" }}
+                    transition={{ duration: 1.3, delay: 0.7, ease: "easeInOut" }}
+                    className="pointer-events-none absolute inset-y-0 w-1/3 skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: showLogo ? 1 : 0 }}
-            transition={{ duration: 1.2, delay: 0.6 }}
-            className="absolute bottom-[38%] h-px w-40 bg-cyan-400 origin-center"
-          />
+
+          {/* boot status + progress rail */}
+          <div className="absolute bottom-[16%] flex flex-col items-center gap-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: showLogo ? 1 : 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="font-mono text-[10px] tracking-[0.4em] text-cyan-300"
+            >
+              INITIALISING SYSTEM
+            </motion.div>
+            <div className="h-px w-44 overflow-hidden bg-white/10">
+              <motion.div
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: showLogo ? 1 : 0 }}
+                transition={{ duration: 1.1, ease: "easeInOut" }}
+                className="h-full w-full origin-left bg-gradient-to-r from-plasma to-cyan-400"
+              />
+            </div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
   );
 }
 
-function TypedHeadline() {
+function TypedHeadline({ base }: { base: number }) {
   const line = "Automate. Scale. Dominate.";
   const words = line.split(" ");
   let charIndex = 0;
 
   return (
-    <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1.02] tracking-tight text-glacier">
+    <p
+      aria-label={line}
+      className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1.02] tracking-tight text-glacier"
+    >
       {words.map((word, wi) => (
         <span key={wi} className="inline-block whitespace-nowrap mr-4">
           {word.split("").map((char) => {
@@ -85,7 +111,7 @@ function TypedHeadline() {
                 key={charIndex}
                 initial={{ opacity: 0, y: 30, rotateX: -60 }}
                 animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                transition={{ duration: 0.5, delay: 2.7 + delay, ease: "easeOut" }}
+                transition={{ duration: 0.5, delay: base + delay, ease: "easeOut" }}
                 className={
                   word.includes("Dominate")
                     ? "inline-block text-gradient"
@@ -98,17 +124,33 @@ function TypedHeadline() {
           })}
         </span>
       ))}
-    </h1>
+    </p>
   );
 }
 
 export default function Hero() {
+  // the boot sequence is a first-impression moment — play it once per session,
+  // not every time the visitor navigates back to the home page.
+  const [skipBoot, setSkipBoot] = useState(false);
   const [booted, setBooted] = useState(false);
+
+  useEffect(() => {
+    try {
+      const seen = sessionStorage.getItem("at-booted") === "1";
+      sessionStorage.setItem("at-booted", "1");
+      if (seen) setSkipBoot(true);
+    } catch {
+      /* storage blocked — just play the intro */
+    }
+  }, []);
   const sectionRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
   });
+
+  // collapse the long boot-synced delays when the intro is skipped
+  const t = (d: number) => (skipBoot ? Math.max(d - 1.8, 0.1) : d);
 
   const gridY = useTransform(scrollYProgress, [0, 1], [0, -100]);
   const headlineY = useTransform(scrollYProgress, [0, 1], [0, 120]);
@@ -121,7 +163,7 @@ export default function Hero() {
       data-cursor-zone="hero"
       className="relative h-[100svh] min-h-[720px] w-full overflow-hidden bg-void"
     >
-      <BootOverlay onDone={() => setBooted(true)} />
+      <BootOverlay key={skipBoot ? "skip" : "boot"} skip={skipBoot} onDone={() => setBooted(true)} />
 
       {/* Layer 0: void glow */}
       <div className="void-glow absolute inset-0" style={{ transform: "translateZ(-120px)" }} />
@@ -149,7 +191,7 @@ export default function Hero() {
           leads_captured += 1
         </div>
         <div className="absolute left-[14%] bottom-[24%] font-mono text-xs text-cyan-300">
-          conversion_rate: 38.2%
+          reply_time: instant
         </div>
         <div className="absolute right-[6%] bottom-[18%] font-mono text-xs text-cyan-300">
           node[04] → node[11] synced
@@ -158,6 +200,7 @@ export default function Hero() {
 
       {/* Foreground content */}
       <motion.div
+        key={skipBoot ? "skip" : "boot"}
         style={{ y: headlineY, opacity: fadeOut }}
         className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center"
       >
@@ -166,7 +209,7 @@ export default function Hero() {
             <motion.span
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 2.4, duration: 0.5 }}
+              transition={{ delay: t(1.8), duration: 0.5 }}
               className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-white/5 px-4 py-1.5 font-mono text-xs tracking-widest text-cyan-300"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />
@@ -175,45 +218,43 @@ export default function Hero() {
           )}
         </AnimatePresence>
 
-        <TypedHeadline />
+        <TypedHeadline base={t(2.1)} />
 
-        <motion.p
+        <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 3.6, duration: 0.7 }}
-          className="mt-8 max-w-2xl text-balance text-base sm:text-lg text-chrome"
+          transition={{ delay: t(3.0), duration: 0.7 }}
+          className="mt-8 max-w-2xl text-balance text-base sm:text-lg font-normal text-chrome"
         >
-          AI-powered systems that replace manual work and multiply results —
-          built for South African businesses ready to grow.
-        </motion.p>
+          Websites, WhatsApp &amp; workflow automation and Google Ads for South
+          African small businesses — built to capture every lead and cut the admin.
+        </motion.h1>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 3.9, duration: 0.7 }}
+          transition={{ delay: t(3.3), duration: 0.7 }}
           className="mt-10 flex flex-col sm:flex-row items-center gap-4"
         >
-          <a
-            href="#offer"
-            data-cursor="button"
-            className="glow-amber-hover group relative overflow-hidden rounded-full bg-plasma px-8 py-4 font-heading text-sm font-semibold tracking-wide text-white transition-shadow duration-300"
+          <Link
+            to="/contact"
+            className="glow-amber-hover group relative overflow-hidden rounded-full px-8 py-4 font-heading text-sm font-semibold tracking-wide text-white transition-shadow duration-300"
             style={{ backgroundColor: "#0047FF" }}
           >
             Book Your Free Audit
-          </a>
-          <a
-            href="#services"
-            data-cursor="button"
+          </Link>
+          <Link
+            to="/services"
             className="rounded-full border border-cyan-400/50 px-8 py-4 font-heading text-sm font-semibold tracking-wide text-cyan-200 transition-colors duration-300 hover:bg-cyan-400/10"
           >
             See What We Build
-          </a>
+          </Link>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 4.3, duration: 1 }}
+          transition={{ delay: t(3.7), duration: 1 }}
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
         >
           <span className="font-mono text-[10px] tracking-[0.3em] text-chrome">SCROLL</span>

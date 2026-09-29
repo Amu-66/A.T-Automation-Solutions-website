@@ -14,9 +14,9 @@ export default function Contact() {
           viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.8 }}
         >
-          <span className="font-mono text-xs tracking-[0.3em] text-cyan-400">CONNECT</span>
+          <span className="font-mono text-xs tracking-[0.3em] text-cyan-400">DIRECT LINES</span>
           <h2 className="mt-4 font-display text-3xl sm:text-4xl font-bold text-glacier">
-            Let's build your system.
+            Reach us directly.
           </h2>
 
           <div className="mt-10 space-y-6">
@@ -56,7 +56,7 @@ export default function Contact() {
               </span>
               <div>
                 <div className="font-mono text-xs text-chrome">LOCATION</div>
-                <div className="text-glacier">Secunda, Mpumalanga — Serving South Africa Nationally</div>
+                <div className="text-glacier">Secunda, Mpumalanga — serving Gauteng, Western Cape &amp; all of SA</div>
               </div>
             </div>
           </div>
@@ -79,7 +79,7 @@ export default function Contact() {
             <div className="mx-auto mb-4 h-14 w-14 rounded-full border border-cyan-400/40 flex items-center justify-center">
               <MapPin className="text-cyan-400" size={26} />
             </div>
-            <div className="font-display text-2xl font-bold text-glacier">Secunda, Mpumalanga</div>
+            <div className="font-display text-2xl font-bold text-glacier">Mpumalanga</div>
           </div>
         </motion.div>
       </div>
