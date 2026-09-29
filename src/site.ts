@@ -3,7 +3,7 @@
 // (e.g. https://atautomationsolutions.co.za) is live — canonical
 // links, the sitemap, social previews and schema all follow it.
 // ─────────────────────────────────────────────────────────────
-export const SITE_URL = "https://a-t-automation-solutions-website.vercel.app";
+export const SITE_URL = "https://www.atautomationsolutions.co.za";
 
 export const BUSINESS_NAME = "A.T Automation Solutions";
 export const WHATSAPP_NUMBER = "27693367393"; // international format, no +

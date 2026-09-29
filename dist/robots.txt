@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://a-t-automation-solutions-website.vercel.app/sitemap.xml
+Sitemap: https://www.atautomationsolutions.co.za/sitemap.xml
