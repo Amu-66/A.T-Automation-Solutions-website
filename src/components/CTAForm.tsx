@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CalendarCheck, CheckCircle2, MessageCircle } from "lucide-react";
-import { FORM_WEBHOOK_URL, WHATSAPP_DISPLAY, waLink } from "../site";
+import { FORM_WEBHOOK_URL, WHATSAPP_DISPLAY, calendlyLink, waLink } from "../site";
 
 const challenges = [
   "Missed leads & slow follow-up",
@@ -19,20 +19,13 @@ const businessTypes = [
   "Established Company (50+)",
 ];
 
-// Audit call slots (South African time). Edit freely.
-const timeSlots = ["09:00", "10:30", "12:00", "14:00", "15:30"];
-
 const pad = (n: number) => String(n).padStart(2, "0");
 const toISODate = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
 function prettyDate(iso: string) {
   if (!iso) return "";
   const [y, m, d] = iso.split("-").map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString("en-ZA", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  });
+  return new Date(y, m - 1, d).toLocaleDateString("en-ZA", { weekday: "long", day: "numeric", month: "long" });
 }
 
 export default function CTAForm() {
@@ -40,6 +33,7 @@ export default function CTAForm() {
   const [data, setData] = useState({
     challenge: "",
     business: "",
+    company: "",
     date: "",
     time: "",
     name: "",
@@ -47,19 +41,28 @@ export default function CTAForm() {
     phone: "",
     designBrief: "",
   });
-  const [status, setStatus] = useState<"idle" | "sending" | "booked" | "whatsapp">("idle");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "whatsapp">("idle");
   const [error, setError] = useState("");
 
   const totalSteps = 3;
   const progress = ((step + 1) / totalSteps) * 100;
 
-  // Earliest bookable day = tomorrow. Only rendered after the visitor
-  // reaches step 3, so it never affects the pre-rendered HTML.
+  // Earliest day = tomorrow. Only rendered after step 3 is reached, so it
+  // never affects the pre-rendered HTML.
   const minDate = useMemo(() => {
     const d = new Date();
     d.setDate(d.getDate() + 1);
     return toISODate(d);
   }, []);
+
+  const booking = () =>
+    calendlyLink({
+      name: data.name.trim(),
+      email: data.email.trim(),
+      company: data.company.trim(),
+      challenge: data.challenge,
+      date: data.date,
+    });
 
   const select = (key: keyof typeof data, value: string) => {
     setData((d) => ({ ...d, [key]: value }));
@@ -68,11 +71,12 @@ export default function CTAForm() {
 
   const summary = () =>
     [
-      "Hi Amukelani, I'd like to book a free audit.",
+      "Hi Amukelani, I'd like a free audit.",
       `Name: ${data.name}`,
       `Email: ${data.email}`,
+      `Company: ${data.company}`,
+      `Preferred time: ${prettyDate(data.date)} at ${data.time}`,
       data.phone ? `WhatsApp: ${data.phone}` : "",
-      `Preferred slot: ${prettyDate(data.date)} at ${data.time}`,
       `Need help with: ${data.challenge}`,
       data.designBrief ? `Design brief: ${data.designBrief}` : "",
       `Business: ${data.business}`,
@@ -83,19 +87,15 @@ export default function CTAForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
     const [y, m, d] = data.date.split("-").map(Number);
     const day = new Date(y, m - 1, d).getDay();
     if (day === 0 || day === 6) {
-      setError("Audit calls run Monday to Friday — please pick a weekday.");
+      setError("Audit calls run Monday to Friday. Please pick a weekday.");
       return;
     }
-    if (!data.time) {
-      setError("Please choose a time slot.");
-      return;
-    }
+    const link = booking();
 
-    // No automation connected yet → hand the request over on WhatsApp.
+    // No automation connected → hand the request over on WhatsApp.
     if (!FORM_WEBHOOK_URL) {
       window.open(waLink(summary()), "_blank", "noopener");
       setStatus("whatsapp");
@@ -104,10 +104,11 @@ export default function CTAForm() {
 
     setStatus("sending");
     const payload = {
-      bookingId: `AT-${Date.now().toString(36).toUpperCase()}`,
+      leadId: `AT-${Date.now().toString(36).toUpperCase()}`,
       name: data.name.trim(),
       email: data.email.trim(),
       phone: data.phone.trim(),
+      company: data.company.trim(),
       challenge: data.challenge,
       designBrief: data.designBrief.trim(),
       business: data.business,
@@ -115,6 +116,7 @@ export default function CTAForm() {
       time: data.time, // HH:MM (SAST)
       startISO: `${data.date}T${data.time}:00+02:00`,
       dateLabel: `${prettyDate(data.date)} at ${data.time}`,
+      calendlyUrl: link,
       source: "website-audit-form",
       submittedAt: new Date().toISOString(),
     };
@@ -127,16 +129,18 @@ export default function CTAForm() {
         mode: "no-cors",
         body: new URLSearchParams(payload),
       });
-      setStatus("booked");
+      setStatus("sent");
+      // Send them straight to Calendly while they're still keen.
+      if (link) setTimeout(() => window.location.assign(link), 1800);
     } catch {
-      // Network problem — fall back to WhatsApp so the lead is never lost.
       window.open(waLink(summary()), "_blank", "noopener");
       setStatus("whatsapp");
     }
   };
 
-  if (status === "booked" || status === "whatsapp") {
-    const booked = status === "booked";
+  if (status === "sent" || status === "whatsapp") {
+    const booked = status === "sent";
+    const link = booking();
     return (
       <div className="glass-card mx-auto max-w-lg rounded-2xl p-10 text-center relative overflow-hidden">
         <motion.div
@@ -153,24 +157,33 @@ export default function CTAForm() {
           )}
         </motion.div>
         <h3 className="mt-6 font-display text-2xl font-bold text-glacier">
-          {booked ? "You're booked in." : "Almost done — hit send."}
+          {booked ? "Got it — now pick your time." : "Almost done — hit send."}
         </h3>
         <p className="mt-2 text-sm text-chrome">
           {booked ? (
             <>
-              Your free audit is set for <span className="text-glacier">{prettyDate(data.date)} at {data.time}</span>.
-              A confirmation is on its way to <span className="text-glacier">{data.email}</span> — check your spam
-              folder if it hasn't arrived in a few minutes.
+              Opening our calendar on <span className="text-glacier">{prettyDate(data.date)}</span>. Lock in{" "}
+              <span className="text-glacier">{data.time}</span> if it's open, or the closest slot. The link
+              is also in your inbox at <span className="text-glacier">{data.email}</span>.
             </>
           ) : (
             <>WhatsApp has opened with your request filled in. Press send and you'll hear back within 24 hours.</>
           )}
         </p>
+        {booked && link && (
+          <a
+            href={link}
+            className="mt-6 inline-flex items-center gap-2 rounded-full px-6 py-3 font-heading text-sm font-semibold text-white"
+            style={{ backgroundColor: "#0047FF" }}
+          >
+            <CalendarCheck size={16} /> Choose a time on Calendly
+          </a>
+        )}
         <a
           href={waLink(summary())}
           target="_blank"
           rel="noreferrer"
-          className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-6 py-3 font-heading text-sm font-semibold text-[#03030A]"
+          className="mt-4 mx-2 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-6 py-3 font-heading text-sm font-semibold text-[#03030A]"
         >
           <MessageCircle size={16} /> {booked ? "Questions? WhatsApp us" : `Send on WhatsApp (${WHATSAPP_DISPLAY})`}
         </a>
@@ -262,36 +275,32 @@ export default function CTAForm() {
             transition={{ duration: 0.4 }}
           >
             <span className="font-mono text-xs text-cyan-400">STEP 03 / 03</span>
-            <h3 className="mt-2 font-display text-xl font-bold text-glacier">Pick a time for your free audit</h3>
-            <p className="mt-1 text-xs text-chrome">30-minute call · Monday to Friday · South African time</p>
+            <h3 className="mt-2 font-display text-xl font-bold text-glacier">When suits you?</h3>
+            <p className="mt-1 text-xs text-chrome">Pick any weekday and time (South African time). We'll confirm it on our calendar next.</p>
 
-            <label className="mt-6 block font-mono text-[11px] tracking-wide text-chrome">DATE</label>
-            <input
-              type="date"
-              required
-              min={minDate}
-              value={data.date}
-              onChange={(e) => setData((d) => ({ ...d, date: e.target.value }))}
-              className={`mt-2 ${input}`}
-            />
-
-            <label className="mt-5 block font-mono text-[11px] tracking-wide text-chrome">TIME</label>
-            <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-5">
-              {timeSlots.map((t) => (
-                <button
-                  type="button"
-                  key={t}
-                  data-cursor="button"
-                  onClick={() => setData((d) => ({ ...d, time: t }))}
-                  className={`rounded-xl border px-3 py-2.5 text-sm transition-colors ${
-                    data.time === t
-                      ? "border-cyan-400 bg-cyan-400/10 text-glacier"
-                      : "border-white/10 text-chrome hover:border-cyan-400/40 hover:text-glacier"
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              <div>
+                <label className="block font-mono text-[11px] tracking-wide text-chrome">DATE</label>
+                <input
+                  type="date"
+                  required
+                  min={minDate}
+                  value={data.date}
+                  onChange={(e) => setData((d) => ({ ...d, date: e.target.value }))}
+                  className={`mt-2 ${input}`}
+                />
+              </div>
+              <div>
+                <label className="block font-mono text-[11px] tracking-wide text-chrome">TIME</label>
+                <input
+                  type="time"
+                  required
+                  step={900}
+                  value={data.time}
+                  onChange={(e) => setData((d) => ({ ...d, time: e.target.value }))}
+                  className={`mt-2 ${input}`}
+                />
+              </div>
             </div>
 
             {data.challenge === "Need professional graphic design" && (
@@ -315,6 +324,14 @@ export default function CTAForm() {
                 autoComplete="name"
                 value={data.name}
                 onChange={(e) => setData((d) => ({ ...d, name: e.target.value }))}
+                className={input}
+              />
+              <input
+                required
+                placeholder="Company / business name"
+                autoComplete="organization"
+                value={data.company}
+                onChange={(e) => setData((d) => ({ ...d, company: e.target.value }))}
                 className={input}
               />
               <input
@@ -345,10 +362,10 @@ export default function CTAForm() {
               className="glow-amber-hover mt-6 w-full rounded-xl bg-plasma py-3.5 font-heading text-sm font-semibold text-white disabled:opacity-40"
               style={{ backgroundColor: "#0047FF" }}
             >
-              {status === "sending" ? "Booking…" : "Book My Free Audit"}
+              {status === "sending" ? "Sending…" : "Book My Free Audit →"}
             </button>
             <p className="mt-3 text-center font-mono text-[10px] tracking-wide text-chrome/70">
-              You'll get an email confirmation and a reminder the day before.
+              Free 15-minute call on Google Meet · no obligation
             </p>
           </motion.form>
         )}

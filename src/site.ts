@@ -14,6 +14,10 @@ export const EMAIL = "amuthandolwethu@gmail.com";
 // Optional: paste a Make.com / n8n webhook URL here and every audit
 // request from the contact form is also POSTed to it as JSON.
 // Leave empty to rely on WhatsApp only.
+// Your Calendly booking page. After the form is sent, visitors go straight
+// here with their name and email already filled in.
+export const CALENDLY_URL = "https://calendly.com/amuthandolwethu/new-meeting";
+
 export const FORM_WEBHOOK_URL = "https://hook.eu1.make.com/mrdaxdfem1bob3poiqidshx7rty10ml6";
 
 export interface PageMeta {
@@ -87,6 +91,29 @@ export const NOT_FOUND_META = {
   title: "Page Not Found | A.T Automation Solutions",
   description: "This page doesn't exist. Head back to A.T Automation Solutions.",
 };
+
+// Builds the Calendly link with the visitor's details pre-filled and the
+// calendar opened on the day they asked for.
+// a1 / a2 = the event's custom questions (Company name, Biggest challenge).
+export function calendlyLink(opts: {
+  name?: string;
+  email?: string;
+  company?: string;
+  challenge?: string;
+  date?: string; // YYYY-MM-DD
+}) {
+  if (!CALENDLY_URL) return "";
+  const u = new URL(CALENDLY_URL);
+  if (opts.name) u.searchParams.set("name", opts.name);
+  if (opts.email) u.searchParams.set("email", opts.email);
+  if (opts.company) u.searchParams.set("a1", opts.company);
+  if (opts.challenge) u.searchParams.set("a2", opts.challenge);
+  if (opts.date) {
+    u.searchParams.set("month", opts.date.slice(0, 7));
+    u.searchParams.set("date", opts.date);
+  }
+  return u.toString();
+}
 
 export function waLink(text: string) {
   return `${WHATSAPP_URL}?text=${encodeURIComponent(text)}`;
