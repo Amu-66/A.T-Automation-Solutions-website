@@ -1,6 +1,7 @@
 import { Share2, MessageCircle, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 import Logo from "./Logo";
+import { LEGAL_NAME, REG_NO } from "../site";
 
 import { EMAIL as EMAIL_ADDRESS, SITE_URL, WHATSAPP_DISPLAY, WHATSAPP_URL } from "../site";
 
@@ -34,7 +35,7 @@ export default function Footer() {
       <div className="circuit-grid-faint absolute inset-0 opacity-30" />
 
       <div className="relative mx-auto max-w-6xl flex flex-col items-center text-center">
-        <Logo markClassName="w-24" showTagline={false} />
+        <Logo className="w-44 sm:w-52" />
 
         <nav className="mt-8 flex flex-wrap justify-center gap-x-8 gap-y-3">
           {navLinks.map((l) => (
@@ -78,7 +79,11 @@ export default function Footer() {
         </nav>
 
         <p className="mt-4 font-mono text-[11px] text-chrome/70">
-          © 2026 A.T Automation Solutions. Secunda, Mpumalanga · Serving Gauteng, Western Cape &amp; all of South Africa.
+          © 2026 {LEGAL_NAME}. Secunda, Mpumalanga · Serving Gauteng, Western Cape &amp; all of South Africa.
+        </p>
+        <p className="mt-2 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/5 px-3 py-1 font-mono text-[11px] text-chrome/80">
+          <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" aria-hidden="true" />
+          Registered company · CIPC Reg. No. {REG_NO}
         </p>
       </div>
     </footer>

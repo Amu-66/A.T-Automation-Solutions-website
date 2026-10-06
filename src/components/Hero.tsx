@@ -52,7 +52,7 @@ function BootOverlay({ onDone, skip }: { onDone: () => void; skip: boolean }) {
                   transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
                   className="relative"
                 >
-                  <Logo markClassName="w-44 sm:w-60" />
+                  <Logo className="w-64 sm:w-[22rem]" />
 
                   {/* chrome shimmer sweep across the lockup */}
                   <motion.div

@@ -4,7 +4,7 @@ const sections: LegalSection[] = [
   {
     heading: "Who we are",
     body: [
-      "A.T Automation Solutions (\"we\", \"us\", \"our\") is a digital automation agency based in Mpumalanga, South Africa, serving clients nationally. We build AI automation systems, workflow automation, websites, lead generation systems, social media and ads management, and professional graphic design.",
+      "A.T Automation Solutions (Pty) Ltd (registration number 2026/767809/07, \"we\", \"us\", \"our\") is a registered South African company and digital automation agency based in Mpumalanga, South Africa, serving clients nationally. We build AI automation systems, workflow automation, websites, lead generation systems, social media and ads management, and professional graphic design.",
       "This policy explains what personal information we collect, why we collect it, how we use and protect it, and the rights you have over it. It is written to align with the Protection of Personal Information Act, 2013 (POPIA).",
     ],
   },

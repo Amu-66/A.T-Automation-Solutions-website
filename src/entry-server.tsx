@@ -14,4 +14,4 @@ export function render(url: string) {
   );
 }
 
-export { PAGES, NOT_FOUND_META, SITE_URL, BUSINESS_NAME, WHATSAPP_NUMBER, EMAIL } from "./site";
+export { PAGES, NOT_FOUND_META, SITE_URL, BUSINESS_NAME, WHATSAPP_NUMBER, EMAIL, LEGAL_NAME, REG_NO } from "./site";

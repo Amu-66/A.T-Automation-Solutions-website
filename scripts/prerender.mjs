@@ -10,7 +10,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
 const ssrEntry = path.join(root, "dist-ssr", "entry-server.js");
 
-const { render, PAGES, NOT_FOUND_META, SITE_URL, BUSINESS_NAME, WHATSAPP_NUMBER, EMAIL } =
+const { render, PAGES, NOT_FOUND_META, SITE_URL, BUSINESS_NAME, WHATSAPP_NUMBER, EMAIL, LEGAL_NAME, REG_NO } =
   await import(pathToFileURL(ssrEntry).href);
 
 const template = fs.readFileSync(path.join(dist, "index.html"), "utf8");
@@ -24,6 +24,8 @@ const businessSchema = {
   "@type": "ProfessionalService",
   "@id": `${SITE_URL}/#business`,
   name: BUSINESS_NAME,
+  legalName: LEGAL_NAME,
+  identifier: { "@type": "PropertyValue", propertyID: "CIPC company registration number", value: REG_NO },
   url: `${SITE_URL}/`,
   image: ogImage,
   logo: `${SITE_URL}/logo.png`,

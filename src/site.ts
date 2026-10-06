@@ -6,6 +6,8 @@
 export const SITE_URL = "https://www.atautomationsolutions.co.za";
 
 export const BUSINESS_NAME = "A.T Automation Solutions";
+export const LEGAL_NAME = "A.T Automation Solutions (Pty) Ltd";
+export const REG_NO = "2026/767809/07";
 export const WHATSAPP_NUMBER = "27693367393"; // international format, no +
 export const WHATSAPP_DISPLAY = "069 336 7393";
 export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;

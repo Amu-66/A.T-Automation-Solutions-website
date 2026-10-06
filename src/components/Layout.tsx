@@ -51,7 +51,7 @@ export default function Layout() {
         {/* row 1 — brand + primary CTA */}
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 sm:px-8 pt-3.5 pb-2.5 lg:py-4">
           <Link to="/" className="flex shrink-0 items-center gap-3">
-            <LogoMark className="h-9 w-auto" idSuffix="hdr" />
+            <LogoMark className="h-10 w-auto" />
             <span className="font-display text-sm font-bold tracking-wide text-glacier">
               A.T <span className="text-gradient">AUTOMATION</span>
             </span>

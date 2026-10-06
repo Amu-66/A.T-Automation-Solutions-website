@@ -4,7 +4,7 @@ const sections: LegalSection[] = [
   {
     heading: "Agreement",
     body: [
-      "These Terms of Service govern the relationship between A.T Automation Solutions (\"we\", \"us\", \"our\") and you, the client, when you engage us for any service or use this website.",
+      "These Terms of Service govern the relationship between A.T Automation Solutions (Pty) Ltd, registration number 2026/767809/07 (\"we\", \"us\", \"our\") and you, the client, when you engage us for any service or use this website.",
       "By requesting a quotation, accepting a proposal, paying a deposit, or instructing us to begin work, you accept these terms. Where a signed proposal or written scope of work conflicts with these terms, that document takes precedence for that project.",
     ],
   },
